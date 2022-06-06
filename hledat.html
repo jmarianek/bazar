@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bazar-hledat</title>
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="jquery.dataTables.min.css" />
+
+<script src="funcs.js"></script>
+<script src="jquery.js"></script>
+<script src="jquery.dataTables.min.js"></script>
+
+<script>
+// URL vracejici prodavane zbozi, zatim vse (cvicna data)
+var searchURL = "https://marianek.cz/bazos/search.php";
+
+/**
+ * 1. pomoci AJAX zavolat sluzbu na URL vyse
+ * 2. ziskany JSON rozparsovat - ziskam pole polozek
+ * 3. projit pole a zobrazit ho do div id="zaznamy"
+ */
+function vypis_zbozi()
+{
+	//alert("aaa");
+	/*
+    $.get(searchURL, function (data) {
+		let vystup = JSON.parse(data);
+	});
+	*/
+	var xhttp = new XMLHttpRequest();
+	xhttp.onload = function() {
+		console.log(xhttp.responseText);
+		let vystup = "";
+		let vystupJSON = JSON.parse(xhttp.responseText);
+		vystup += "<thead>";
+		vystup += "<tr>";
+		vystup += "<th>Prodavajici</th>";
+		vystup += "<th>Zbozi</th>";
+		vystup += "<th>Cena</th>";
+		vystup += "</tr>";
+		vystup += "</thead>";
+		vystup += "<tbody>";
+        for(let i = 0; i < vystupJSON.items.length; i++ ) {
+			vystup += "<tr>";
+			vystup += "<td>" + vystupJSON.items[i].name + "</td>";
+			vystup += "<td>" + vystupJSON.items[i].descr + "</td>";
+			vystup += "<td>" + vystupJSON.items[i].price + "</td>";
+			vystup += "</tr>";
+		}
+		vystup += "</tbody>";
+
+		document.getElementById("zaznamy").innerHTML = vystup;
+
+		$('#zaznamy').DataTable();
+	}
+	xhttp.open("GET", searchURL, true);
+	xhttp.send();
+
+	// nebude se odesilat form., tj. ani kontrolovat
+	return false;
+}
+
+</script>
+</head>
+<body onload="zobraz_nav()">
+<nav id="id_nav">
+	<!-- zakomentovano - toto menu vytvori fce zobraz_nav()
+<span>Prodat</span>
+<span>Hledat</span>
+<span>Nápověda</span>
+--></nav>
+
+<h1>Bazar - hledat</h1>
+<form>
+	<p>
+		<label for="nazev">Co hledáte?</label>
+		<input required id="nazev" type="text" />
+	</p>
+	<p>
+		<label for="kategorie">Kategorie:</label>
+		<select required id="kategorie">
+			<option>elektronika</option>
+			<option>auto-moto</option>
+			<option>dům a zahrada</option>
+			<option>knihy</option>
+			<option>oblečení</option>
+		</select>
+	</p>
+	<p>
+		<label for="loc">Lokalita (ve tvaru PSČ):</label>
+		<input required id="loc" type="number" />
+	</p>
+	<p>
+		<label for="okoli">Okolí:</label>
+		<input id="okoli" type="number" />
+		<label for="okoli">km</label>
+	</p>
+	<p>
+		<label for="stav">Stav:</label>
+		<select id="stav">
+			<option>nové</option>
+			<option>velmi dobrý</option>
+			<option>dobrý</option>
+			<option>uspokojivý</option>
+		</select>
+	</p>
+	<p>
+		<label for="cena1">Cena od:</label>
+		<input id="cena1" required type="number" />
+		<label for="cena2"> - do: </label>
+		<input id="cena2" required type="number" />
+		<label for="cena2"> Kč</label>
+	</p>
+	<p>
+		<button onclick="vypis_zbozi(); return false;">Hledat</button>
+	</p>
+</form>
+
+<table id="zaznamy">
+</table>
+
+</body>
+</html>
